@@ -6,11 +6,11 @@ Noticias diárias feitas por um(s) robô(s)
 
 # Para fazer
 
-- [ ] Base da api
-- [ ] Criar rota responsável pela criação do aúdio
-- [ ] Procurar sites de notícias através de um crawler
-  - [ ] g1.globo
-- [ ] Separar notícias
+- [x] Base da api
+- [x] Criar rota responsável pela busca e criação dos audio final
+- [x] Procurar sites de notícias através de um crawler
+  - [x] g1.globo
+- [x] Separar notícias
 - [ ] Separar sentenças de cada notícia para que seja possível trabalhar com elas separadamente
 - [ ] Criar um host para falar
 - [ ] Criar um introdução
