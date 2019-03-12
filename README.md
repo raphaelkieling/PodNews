@@ -1,5 +1,7 @@
 # PodNews
 
+<img src="http://icons.iconarchive.com/icons/diversity-avatars/avatars/128/robot-01-icon.png">
+
 Noticiais diárias feitas por um(s) robô(s)
 
 # Para fazer
