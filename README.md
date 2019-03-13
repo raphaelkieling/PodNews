@@ -9,7 +9,7 @@ Noticias diárias feitas por um(s) robô(s). O projeto foi inspirado tanto no pr
 
 # Desenvolvendo
 
-Ainda **NÃO** é possível baixar o CLI, pois está em faze de desenvolvimento.
+Ainda **NÃO** é possível baixar o CLI, pois está em fase de desenvolvimento.
 
 ```
     // baixando o repositório
