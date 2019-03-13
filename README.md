@@ -1,14 +1,14 @@
 # PodNews
 
-<img src="http://icons.iconarchive.com/icons/diversity-avatars/avatars/128/robot-01-icon.png">
+<div style="text-align:center;">
+    <img src="http://icons.iconarchive.com/icons/diversity-avatars/avatars/128/robot-01-icon.png">
+</div>
 
 Noticias diárias feitas por um(s) robô(s). O projeto foi inspirado tanto no projeto do [Podbot](https://github.com/lhcgoncalves/podbot) do Luiz Gonçalves, quanto no projeto [Video-Maker](https://github.com/filipedeschamps/video-maker) do Felipe Deschamps. O foco é criar um podcast de notícias diárias de forma automática.
 
 # Contribuindo
 - Crie uma branch assim `meu-nome/minha-funcionalidade`
 - Trabalhe nela e de git pull ao finalizar
-
-Mas calma, deixa eu terminar a base da api hehe
 
 # Todo
 
