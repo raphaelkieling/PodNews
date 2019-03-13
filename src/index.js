@@ -7,19 +7,30 @@ const RobotFileManager = require('./robots/file-manager');
 const RobotAudio       = require('./robots/audio');
 const Commander        = require('./commander');
 const print            = require('./utils/print');
-
+const ora              = require('ora');
 // Crawlers
 const Globo = require('./crawlers/globo');
+const Folha = require('./crawlers/folha');
+
+async function load(text, fn){
+	let loader = ora(text).start();
+	await fn(loader);
+	loader.succeed();
+} 
 
 async function Init(){
 	let { limit } = Commander.init();
 
-	let robotCrawler = new RobotCrawler({ 
-		crawlers: [ new Globo({ limit }) ] 
-	})
-	   
-	// Robots 
+	let data = {};
+	
 	let manager = new RobotFileManager();
+	
+	let robotCrawler = new RobotCrawler({ 
+		crawlers: [ 
+			new Globo({ limit }),
+			new Folha({ limit })
+		] 
+	})
 
 	const ROBOTS = {
 		crawler: robotCrawler,
@@ -31,25 +42,25 @@ async function Init(){
 	// Init
 	print.banner('INIT', 'Podnews')
 
-	console.log(chalk.yellow('1 - Clean temporary folder'));
-	await ROBOTS.manager.resetTempDirectory();
-	print.line('yellow');
+	await load('1 - Clean temporary folder',async () => {
+		await ROBOTS.manager.resetTempDirectory();
+	});
 
-	let data = {};
+	await load('2 - Crawler',async (loader) => {
+		ROBOTS.crawler.loader = loader;
+		data = await ROBOTS.crawler.getAllNews();
+	});
 
-	console.log(chalk.yellow('2 - Crawler'));
-	data = await ROBOTS.crawler.getAllNews();
-	print.line('yellow');
+	await load('3 - Text to Speech',async (loader) => {
+		ROBOTS.voice.loader = loader;
 
+		audioIntroBinary  = await ROBOTS.voice.getIntro();
+		data = await ROBOTS.voice.getDataWithAudio({ data, audioIntroBinary });
+	});
 
-	console.log(chalk.yellow('3 - Text to Speech'));
-	data = await ROBOTS.voice.getDataWithAudio({ data });
-	print.line('yellow');
-
-	console.log(chalk.yellow('4 - Concat audio'));
-	data = await ROBOTS.audio.concatAudio({ data });
-	print.line('yellow');
-	
+	await load('4 - Concat audio',async (loader) => {
+		data = await ROBOTS.audio.concatAudio({ data });
+	});
 }
 
 module.exports = {

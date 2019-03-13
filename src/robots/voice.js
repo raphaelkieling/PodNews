@@ -6,6 +6,13 @@ const print        = require('../utils/print')
 class Voice{
     constructor(){
         this.client = new textToSpeech.TextToSpeechClient();
+        this.intro  = process.env.VOICE_INTRO;
+        this.loader = null;
+    }
+
+    async getIntro(){
+        this.loader.text = "Get intro";
+        return await this.textToAudioFile(this.intro);
     }
     
     /**

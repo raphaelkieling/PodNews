@@ -1,8 +1,9 @@
 const program = require('commander');
+const pjson   = require('../package.json')
 
 function init(){
 	program
-	  .version('0.1.0')
+	  .version(pjson.version)
 	  .option('-l, --limit [limit]', 'Limit notices')
 	  .parse(process.argv);
 

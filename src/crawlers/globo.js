@@ -2,13 +2,14 @@ const rp        = require("request-promise");
 const cheerio   = require('cheerio');
 const Tokenizer = require('sentence-tokenizer');
 const chalk     = require('chalk');
-const print     = require('../utils/print');
 
 class Globo {
     constructor({ limit }){
         if(!process.env.GOOGLE_APPLICATION_CREDENTIALS) throw new Error('credentials.json not defined in .env')
 
         this.limit = limit ? parseInt(limit) : 1;
+        this.name  = "G1 Globo";
+        this.urlNews = 'https://g1.globo.com';
     }
 
     async _getSentences(url){
@@ -19,19 +20,16 @@ class Globo {
             }
         };
 
-        let tokenizer = new Tokenizer('Globo');
+        let tokenizer = new Tokenizer(this.name);
         let contentString = await rp(options).then(async ($) => $('.content-text__container ').text());
         tokenizer.setEntry(contentString);
         let sentences = tokenizer.getSentences();
         return sentences;
     }
 
-    _getNews() {
-        console.log('');
-        console.log(chalk.yellow('GLOBO'));
-
+    getNews({ loader = null }) {
         let options = {
-            uri: 'https://g1.globo.com',
+            uri: this.urlNews,
             transform: function (body) {
                 return cheerio.load(body);
             }
@@ -50,7 +48,8 @@ class Globo {
                     let description = $(elem).find('.feed-post-body-resumo').find('div').text();
                     let url         = $(elem).find('.feed-post-body-title').find('.feed-post-link').attr('href');
 
-                    console.log(chalk.yellow(`~> Finded with title => ${title}`));
+                    loader.text = `🕷: ${title}`;
+
 
                     news[i] = { title, description, url };
 
@@ -61,7 +60,6 @@ class Globo {
                     news[index].sentences = await this._getSentences(news[index].url);
                 }
                 
-                console.log('');
                 return news;
             })
     }
