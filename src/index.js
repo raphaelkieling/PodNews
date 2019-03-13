@@ -1,10 +1,10 @@
 require('dotenv').config();
 
-const chalk            = require('chalk');
 const RobotCrawler     = require('./robots/crawler');
 const RobotVoice       = require('./robots/voice');
 const RobotFileManager = require('./robots/file-manager');
 const RobotAudio       = require('./robots/audio');
+const RobotNews        = require('./robots/news');
 const Commander        = require('./commander');
 const print            = require('./utils/print');
 const ora              = require('ora');
@@ -34,6 +34,7 @@ async function Init(){
 
 	const ROBOTS = {
 		crawler: robotCrawler,
+		news: new RobotNews({ limit }),
 		voice: new RobotVoice(),
 		manager,
 		audio: new RobotAudio({ fileManager: manager })
@@ -46,20 +47,26 @@ async function Init(){
 		await ROBOTS.manager.resetTempDirectory();
 	});
 
-	await load('2 - Crawler',async (loader) => {
-		ROBOTS.crawler.loader = loader;
-		data = await ROBOTS.crawler.getAllNews();
-	});
+	// await load('2 - Crawler',async (loader) => {
+	// 	ROBOTS.crawler.loader = loader;
+	// 	data = await ROBOTS.crawler.getAllNews();
+	// });
+
+	await load('2 - Get news from Google News', async ()=> {
+		data = await ROBOTS.news.getNews();
+	})
 
 	await load('3 - Text to Speech',async (loader) => {
 		ROBOTS.voice.loader = loader;
 
-		audioIntroBinary  = await ROBOTS.voice.getIntro();
-		data = await ROBOTS.voice.getDataWithAudio({ data, audioIntroBinary });
+		data = await ROBOTS.voice.getDataWithAudio({ data });
 	});
 
 	await load('4 - Concat audio',async (loader) => {
-		data = await ROBOTS.audio.concatAudio({ data });
+		ROBOTS.audio.loader = loader;
+		let audioIntroBinary  = await ROBOTS.voice.getIntro();
+
+		data = await ROBOTS.audio.concatAudio({ data, audioIntroBinary });
 	});
 }
 

@@ -1,30 +1,60 @@
-const fs    = require('fs');
-const print = require('../utils/print');
-const path  = require('path');
+const fs     = require('fs');
+const path   = require('path');
+const audioconcat = require('audioconcat');
+const ffmpegInstaller = require('@ffmpeg-installer/ffmpeg');
+const ffmpeg = require('fluent-ffmpeg');
+
+ffmpeg.setFfmpegPath(ffmpegInstaller.path);
 
 class Audio{
 	constructor({ fileManager }){
 		this.fileManager = fileManager;
+		this.loader      = null;
 	}
 
 	async saveAudio(name, binary){
 		let pathWithName = path.resolve(this.fileManager.getPathTemp(), `${name}.mp3`);
-		return await fs.writeFileSync(pathWithName, binary, 'binary');
+		await fs.writeFileSync(pathWithName, binary, 'binary');
+		return pathWithName;
+	}
+
+	_concatAudio(songs){
+		return new Promise((resolve ,reject)=>{
+			audioconcat(songs)
+				.concat(path.resolve(this.fileManager.getPathTemp(), 'all.mp3'))
+				.on('start', (command) => {
+					this.loader.text = `⚙️ Concat start`;
+					resolve();
+				})
+				.on('error', (err, stdout, stderr) => {
+					this.loader.text = `⚙️ Concat Error ${err}`;
+					resolve();
+				})
+				.on('end', (output) => {
+					this.loader.text = `⚙️ Concat finished: ${output}`;
+					resolve();
+				})
+		})
 	}
 
 	async concatAudio({ data, audioIntroBinary }){
-		await this.saveAudio('intro', audioIntroBinary);
+		let introPath = await this.saveAudio('intro', audioIntroBinary);
 
 		let size = data.length;
         let count = 0;
+		let audiosToConcat = [];
 
 		for(let source of data){
-        	await this.saveAudio(Math.random().toString(), source.audio.title);
-        	await this.saveAudio(Math.random().toString(), source.audio.description);
+			this.loader.text = `⚙️ (${size}/${++count}) ~> ${source.title.slice(0, 15)}...`;
+
+        	audiosToConcat.push(await this.saveAudio(Math.random().toString(), source.audio.title));
+        	audiosToConcat.push(await this.saveAudio(Math.random().toString(), source.audio.description));
 
         	for(let sentence of source.audio.sentences){
-				await this.saveAudio(Math.random().toString(), sentence.audio);
-        	}
+				audiosToConcat.push(await this.saveAudio(Math.random().toString(), sentence.audio));
+			}
+			
+			await this._concatAudio(audiosToConcat);
 		}
 	}
 }

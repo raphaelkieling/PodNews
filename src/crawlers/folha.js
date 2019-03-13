@@ -1,8 +1,6 @@
 const rp        = require("request-promise");
 const cheerio   = require('cheerio');
 const Tokenizer = require('sentence-tokenizer');
-const chalk     = require('chalk');
-const fs        = require('fs');
 
 class Folha {
     constructor({ limit }){
