@@ -1,13 +1,68 @@
 const Tokenizer = require('sentence-tokenizer');
-const NewsAPI = require('newsapi');
+const NewsAPI   = require('newsapi');
+const prompts   = require('prompts');
 
 class News{
-    constructor({ limit }){
-        this.key = process.env.GOOGLE_NEWS_CREDENTIAL;
-        this.limit = limit ? parseInt(limit) : 1;
+    constructor({ limit = 1 , language = 'pt', category='general'}){
+        this.key      = process.env.GOOGLE_NEWS_CREDENTIAL;
+        this.limit    = limit;
+        this.loader   = null;
+        this.language = this._getLanguage(language);
+        this.category = category;
+        this.SCOPE    = {
+            everything: 'everything',
+            topHeadlines: 'topHeadlines' 
+        }
     }
 
-    getNews(){
+    _getLanguage(language){
+        switch(language){
+            case 'pt-BR':
+                return 'pt'
+            case 'en':
+                return 'en'
+            default:
+                return language;
+        }
+    }
+
+    async getSearchValue(){
+        this.loader.stop();
+
+        let result = await prompts({
+            type: 'text',
+            name: 'value',
+            message: 'Type a search to news'
+        })
+
+        this.loader.start();
+
+        return result.value;
+    }
+
+    async selectNews(news){
+        if(!news) throw new Error('Not has news to work');
+
+        this.loader.stop();
+
+        let sanitizedNews = [];
+        for(let newObj of news){
+            sanitizedNews.push({ title: newObj.title, value: newObj });
+        }
+
+        let result = await prompts({
+            type: 'multiselect',
+            name: 'value',
+            message: 'Choice a new',
+            choices: sanitizedNews
+        })
+
+        this.loader.start();
+
+        return result.value;
+    }
+
+    async getNews(){
         const newsapi = new NewsAPI(this.key);
 
         let sanitizeNews = (news) => news.map(newObj => ({
@@ -23,15 +78,29 @@ class News{
 
             newObj.sentences = tokenizer.getSentences();
             return newObj;
-        })
+        });
 
-        return newsapi.v2.topHeadlines({
-                country: 'br',
-                pageSize: this.limit
-            })
+        let searchValue = await this.getSearchValue();
+
+        let scope = searchValue ? this.SCOPE.everything : this.SCOPE.topHeadlines;
+
+        let optionsNewsApi = {
+            language: this.language,
+            q: searchValue,
+            pageSize: this.limit,
+            sortBy: 'relevancy'
+        };
+
+        // Add category if is 'topHeadlines', everything scope not support this parameter 
+        if(scope === this.SCOPE.topHeadlines){
+            optionsNewsApi.category = this.category;
+        }
+        
+        return newsapi.v2[scope](optionsNewsApi)
             .then(response => response.articles)
             .then(sanitizeNews)
             .then(putSentences)
+            .then(async news => await this.selectNews(news));
     }
 }
 

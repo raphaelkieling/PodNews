@@ -4,10 +4,22 @@ const textToSpeech = require('@google-cloud/text-to-speech');
 const print        = require('../utils/print')
 
 class Voice{
-    constructor(){
+    constructor({ language = 'pt-BR' }){
         this.client = new textToSpeech.TextToSpeechClient();
         this.intro  = process.env.VOICE_INTRO;
         this.loader = null;
+        this.language = this._getLanguage(language)
+    }
+
+    _getLanguage(language){
+        switch(language){
+            case 'pt-BR':
+                return 'pt-BR'
+            case 'en':
+                return 'en'
+            default:
+                return language;
+        }
     }
 
     async getIntro(){
@@ -26,7 +38,7 @@ class Voice{
         return new Promise((resolve, reject)=>{
             const request = {
                 input: { text: text },
-                voice: { languageCode: 'pt-BR', ssmlGender: 'male' },
+                voice: { languageCode: this.language, ssmlGender: 'male' },
                 audioConfig: { audioEncoding: 'MP3' },
             };
             
@@ -37,7 +49,7 @@ class Voice{
         })
     }
 
-    async getDataWithAudio({ data }){
+    async getDataWithAudio({ data }){  
         let size = data.length;
         let count = 0;
 

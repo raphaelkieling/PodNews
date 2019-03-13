@@ -25,6 +25,7 @@
     "helmet": "^3.16.0",
     "newsapi": "^2.4.0",
     "ora": "^3.2.0",
+    "prompts": "^2.0.3",
     "request": "^2.88.0",
     "request-promise": "^4.2.4",
     "rimraf": "^2.6.3",

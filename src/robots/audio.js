@@ -23,29 +23,29 @@ class Audio{
 			audioconcat(songs)
 				.concat(path.resolve(this.fileManager.getPathTemp(), 'all.mp3'))
 				.on('start', (command) => {
-					this.loader.text = `⚙️ Concat start`;
+					this.loader.text = `⚙️	Concat start`;
 					resolve();
 				})
 				.on('error', (err, stdout, stderr) => {
-					this.loader.text = `⚙️ Concat Error ${err}`;
+					new Error(err)
 					resolve();
 				})
 				.on('end', (output) => {
-					this.loader.text = `⚙️ Concat finished: ${output}`;
+					this.loader.text = `⚙️	Concat finished: ${output}`;
 					resolve();
 				})
 		})
 	}
 
 	async concatAudio({ data, audioIntroBinary }){
-		let introPath = await this.saveAudio('intro', audioIntroBinary);
-
 		let size = data.length;
         let count = 0;
-		let audiosToConcat = [];
+		let audiosToConcat = [
+			await this.saveAudio('intro', audioIntroBinary)
+		];
 
 		for(let source of data){
-			this.loader.text = `⚙️ (${size}/${++count}) ~> ${source.title.slice(0, 15)}...`;
+			this.loader.text = `⚙️	(${size}/${++count}) ~> ${source.title.slice(0, 15)}...`;
 
         	audiosToConcat.push(await this.saveAudio(Math.random().toString(), source.audio.title));
         	audiosToConcat.push(await this.saveAudio(Math.random().toString(), source.audio.description));

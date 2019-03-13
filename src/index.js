@@ -8,6 +8,8 @@ const RobotNews        = require('./robots/news');
 const Commander        = require('./commander');
 const print            = require('./utils/print');
 const ora              = require('ora');
+const prompts          = require('prompts');
+
 // Crawlers
 const Globo = require('./crawlers/globo');
 const Folha = require('./crawlers/folha');
@@ -18,11 +20,54 @@ async function load(text, fn){
 	loader.succeed();
 } 
 
-async function Init(){
-	let { limit } = Commander.init();
+async function answerLanguage(){
+	let result = await prompts({
+		type: 'select',
+		name: 'value',
+		message: 'Choice a language',
+		choices: [
+			{ title: 'pt-BR', value: 'pt-BR' },
+			{ title: 'en', value: 'en' }
+		]
+	})
 
-	let data = {};
+	return result.value;
+}
+
+async function answerLimitNews(){
+	let response = await prompts({
+		type: 'number',
+		name: 'limit',
+		message: 'What is the limit of news?',
+		initial: 1
+	});
+
+	return response.limit;
+}
+
+async function answerCategory(){
+	let response = await prompts({
+		type: 'text',
+		name: 'category',
+		message: 'What is the category?',
+		initial: ''
+	});
+
+	return response.category;
+}
+
+async function Init(){
+	let { limit, language, category } = Commander.init();
 	
+	// Init
+	print.banner('INIT', 'Podnews')
+
+	if(!limit) limit = await answerLimitNews();
+	if(!language) language = await answerLanguage();
+	if(!category) category = await answerCategory();
+	
+	let data = {};
+
 	let manager = new RobotFileManager();
 	
 	let robotCrawler = new RobotCrawler({ 
@@ -34,14 +79,11 @@ async function Init(){
 
 	const ROBOTS = {
 		crawler: robotCrawler,
-		news: new RobotNews({ limit }),
-		voice: new RobotVoice(),
+		news: new RobotNews({ limit, language, category }),
+		voice: new RobotVoice({ language }),
 		manager,
 		audio: new RobotAudio({ fileManager: manager })
 	}
-
-	// Init
-	print.banner('INIT', 'Podnews')
 
 	await load('1 - Clean temporary folder',async () => {
 		await ROBOTS.manager.resetTempDirectory();
@@ -52,13 +94,13 @@ async function Init(){
 	// 	data = await ROBOTS.crawler.getAllNews();
 	// });
 
-	await load('2 - Get news from Google News', async ()=> {
+	await load('2 - Get news from Google News', async (loader)=> {
+		ROBOTS.news.loader = loader;
 		data = await ROBOTS.news.getNews();
 	})
 
 	await load('3 - Text to Speech',async (loader) => {
 		ROBOTS.voice.loader = loader;
-
 		data = await ROBOTS.voice.getDataWithAudio({ data });
 	});
 
