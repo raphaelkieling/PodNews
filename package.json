@@ -5,15 +5,22 @@
   "repository": "https://github.com/raphaelkieling/PodNews",
   "author": "Raphael Kieling <rapha_kieling@hotmail.com>",
   "license": "MIT",
+  "bin": "./bin/podnews",
+  "scripts": {
+    "start": "node src/index"
+  },
   "dependencies": {
     "@google-cloud/text-to-speech": "^0.5.1",
+    "chalk": "^2.4.2",
     "cheerio": "^1.0.0-rc.2",
+    "commander": "^2.19.0",
     "cors": "^2.8.5",
     "crawler": "^1.2.0",
     "dotenv": "^6.2.0",
     "express": "^4.16.4",
     "helmet": "^3.16.0",
     "request": "^2.88.0",
-    "request-promise": "^4.2.4"
+    "request-promise": "^4.2.4",
+    "sentence-tokenizer": "^1.0.1"
   }
 }

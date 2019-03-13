@@ -1,6 +1,6 @@
 require('dotenv').config();
 
-const fs = require('fs');
+const fs           = require('fs');
 const textToSpeech = require('@google-cloud/text-to-speech');
 
 class Voice{
@@ -25,24 +25,31 @@ class Voice{
             
             this.client.synthesizeSpeech(request, (err, response) => {
                 if (err) reject(err);
-
-                console.log(response)
-            
-               resolve(response ? response.audioContent : null);
+                resolve(response ? response.audioContent : null);
             });
         })
     }
 
     async run({ data }){
         for(let source of data){
-            source.audio = {}
-            source.audio.title = await this.textToAudioFile(source.title)
-            source.audio.description = await this.textToAudioFile(source.description)
-            source.audio.content = await this.textToAudioFile(source.content)
+            source.audio = {};
+            source.audio.title = await this.textToAudioFile(source.title);
+            source.audio.description = await this.textToAudioFile(source.description);
+            source.audio.sentences = [];
 
-            await fs.writeFileSync("/home/egsyspc20/projects/PodNews/temp/"+Math.random().toString()+'.mp3', source.audio.title, 'binary')
-            await fs.writeFileSync("/home/egsyspc20/projects/PodNews/temp/"+Math.random().toString()+'.mp3', source.audio.description, 'binary')
-            await fs.writeFileSync("/home/egsyspc20/projects/PodNews/temp/"+Math.random().toString()+'.mp3', source.audio.content, 'binary')
+            for(let sentence of source.sentences){
+                let audioBinary = await this.textToAudioFile(sentence);
+                source.audio.sentences.push({
+                    text: sentence,
+                    audio: audioBinary
+                });
+
+                await fs.writeFileSync("C:\\Users\\rapha\\Projects\\PodNews\\temp\\"+Math.random().toString()+'.mp3', audioBinary, 'binary')
+            }
+
+            await fs.writeFileSync("C:\\Users\\rapha\\Projects\\PodNews\\temp\\"+Math.random().toString()+'.mp3', source.audio.title, 'binary')
+            await fs.writeFileSync("C:\\Users\\rapha\\Projects\\PodNews\\temp\\"+Math.random().toString()+'.mp3', source.audio.description, 'binary')
+            
         }
 
         return data;

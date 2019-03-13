@@ -1,0 +1,5 @@
+#!/usr/bin/env node
+
+let podnews = require('../src/index');
+
+podnews.init()

@@ -1,14 +1,39 @@
 require('dotenv').config();
 
-const express       = require('express');
-const app           = express();
+const chalk         = require('chalk');
+const RobotCrawler  = require('./robots/crawler');
+const RobotVoice    = require('./robots/voice');
+const Commander     = require('./commander');
+const print         = require('./utils/print');
 
-const NewsRoute     = require('./routes/news');
+// Crawlers
+const Globo = require('./crawlers/globo');
 
-app.use('/news', NewsRoute);
+async function Init(){
+	let { limit } = Commander.init();
 
-const PORT = process.env.PORT || 3000;
+	let robotCrawler = new RobotCrawler({
+	    crawlers: [ new Globo({ limit }) ]
+	})
+	   
+	// Robots 
+	const ROBOTS = {
+		crawler: robotCrawler,
+		voice: new RobotVoice()
+	}
 
-app.listen(PORT, () => {
-    console.log(`Running in ${PORT}`)
-})
+	print.banner('INIT', 'Podnews')
+
+	let data = {};
+	console.log(chalk.yellow('1 - Crawler'));
+	data = await ROBOTS.crawler.run();
+	print.line('yellow');
+	console.log(chalk.yellow('2 - Text to Speech'));
+	data = await ROBOTS.voice.run({ data });
+
+	console.log(data);
+}
+
+module.exports = {
+	init: Init
+}
