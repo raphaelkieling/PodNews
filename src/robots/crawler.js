@@ -1,9 +1,9 @@
-class RobotCrawler {
+class Crawler {
     constructor({ crawlers = [] }) { 
         this.crawlers = crawlers;
     }
 
-    async run() {
+    async getAllNews() {
         let content = [];
         for(let craw of this.crawlers){
             content = content.concat(await craw.run());
@@ -12,4 +12,4 @@ class RobotCrawler {
     }
 }
 
-module.exports = RobotCrawler;
+module.exports = Crawler;

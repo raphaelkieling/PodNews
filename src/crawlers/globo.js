@@ -27,6 +27,9 @@ class Globo {
     }
 
     _getNews() {
+        console.log('');
+        console.log(chalk.yellow('GLOBO'));
+
         let options = {
             uri: 'https://g1.globo.com',
             transform: function (body) {
@@ -36,8 +39,6 @@ class Globo {
 
         return rp(options)
             .then(async ($) => {
-                print.banner('CRAWLER', 'G1 Globo');
-
                 let news         = [];
                 let newsElements = $('.feed-post-body');
                 let count        = 0;
@@ -49,7 +50,7 @@ class Globo {
                     let description = $(elem).find('.feed-post-body-resumo').find('div').text();
                     let url         = $(elem).find('.feed-post-body-title').find('.feed-post-link').attr('href');
 
-                    console.log(chalk.yellow(`Finded with title => ${title}`));
+                    console.log(chalk.yellow(`~> Finded with title => ${title}`));
 
                     news[i] = { title, description, url };
 
@@ -59,7 +60,8 @@ class Globo {
                 for(let index in news){
                     news[index].sentences = await this._getSentences(news[index].url);
                 }
-
+                
+                console.log('');
                 return news;
             })
     }

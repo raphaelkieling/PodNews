@@ -21,6 +21,7 @@
     "helmet": "^3.16.0",
     "request": "^2.88.0",
     "request-promise": "^4.2.4",
+    "rimraf": "^2.6.3",
     "sentence-tokenizer": "^1.0.1"
   }
 }

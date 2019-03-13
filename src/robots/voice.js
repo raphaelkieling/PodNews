@@ -1,7 +1,7 @@
 require('dotenv').config();
 
-const fs           = require('fs');
 const textToSpeech = require('@google-cloud/text-to-speech');
+const print        = require('../utils/print')
 
 class Voice{
     constructor(){
@@ -30,8 +30,14 @@ class Voice{
         })
     }
 
-    async run({ data }){
+    async getDataWithAudio({ data }){
+        let size = data.length;
+        let count = 0;
+
+        print.line('yellow');
+
         for(let source of data){
+            print.message(`~>  Processig ${++count}/${size}`);
             source.audio = {};
             source.audio.title = await this.textToAudioFile(source.title);
             source.audio.description = await this.textToAudioFile(source.description);
@@ -44,12 +50,7 @@ class Voice{
                     audio: audioBinary
                 });
 
-                await fs.writeFileSync("C:\\Users\\rapha\\Projects\\PodNews\\temp\\"+Math.random().toString()+'.mp3', audioBinary, 'binary')
             }
-
-            await fs.writeFileSync("C:\\Users\\rapha\\Projects\\PodNews\\temp\\"+Math.random().toString()+'.mp3', source.audio.title, 'binary')
-            await fs.writeFileSync("C:\\Users\\rapha\\Projects\\PodNews\\temp\\"+Math.random().toString()+'.mp3', source.audio.description, 'binary')
-            
         }
 
         return data;

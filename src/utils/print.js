@@ -10,7 +10,12 @@ function line(color){
 	console.log(chalk[color]('--------------'));
 }
 
+function message(text){
+	console.log(chalk.yellow(text));
+}
+
 module.exports = {
 	banner,
-	line
+	line,
+	message
 }
