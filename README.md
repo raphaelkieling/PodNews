@@ -1,4 +1,4 @@
-# PodNews
+# Podnews
 
 <p align="center">
   <img src="http://icons.iconarchive.com/icons/diversity-avatars/avatars/128/robot-01-icon.png" width="100">
