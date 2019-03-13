@@ -1,8 +1,8 @@
 # PodNews
 
-<div style="text-align:center;">
+<p style="text-align:center;">
     <img src="http://icons.iconarchive.com/icons/diversity-avatars/avatars/128/robot-01-icon.png">
-</div>
+</p>
 
 Noticias diárias feitas por um(s) robô(s). O projeto foi inspirado tanto no projeto do [Podbot](https://github.com/lhcgoncalves/podbot) do Luiz Gonçalves, quanto no projeto [Video-Maker](https://github.com/filipedeschamps/video-maker) do Felipe Deschamps. O foco é criar um podcast de notícias diárias de forma automática.
 
