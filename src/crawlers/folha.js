@@ -38,10 +38,9 @@ class Folha {
                 let title = newObject.title;
                 let url   = newObject.url;
 
-                loader.text = `🕷: ${title}`;
+                loader.text = `📄  ${this.name} (${this.limit}/${++count}) ~> ${title.slice(0, 15)}...`;
                 
                 news.push({ title, description: '', url });
-                count++;
             }
 
             for(let index in news){

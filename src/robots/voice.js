@@ -11,7 +11,7 @@ class Voice{
     }
 
     async getIntro(){
-        this.loader.text = "Get intro";
+        this.loader.text = `🔈  Get Intro`;
         return await this.textToAudioFile(this.intro);
     }
     
@@ -41,10 +41,8 @@ class Voice{
         let size = data.length;
         let count = 0;
 
-        print.line('yellow');
-
         for(let source of data){
-            print.message(`~>  Processig ${++count}/${size}`);
+            this.loader.text = `🔈  (${size}/${++count}) ~> ${source.title.slice(0, 15)}...`;
             source.audio = {};
             source.audio.title = await this.textToAudioFile(source.title);
             source.audio.description = await this.textToAudioFile(source.description);

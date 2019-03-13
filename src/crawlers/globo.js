@@ -48,12 +48,9 @@ class Globo {
                     let description = $(elem).find('.feed-post-body-resumo').find('div').text();
                     let url         = $(elem).find('.feed-post-body-title').find('.feed-post-link').attr('href');
 
-                    loader.text = `🕷: ${title}`;
-
+                    loader.text = `📄  ${this.name} (${this.limit}/${++count}) ~> ${title.slice(0, 15)}...`;
 
                     news[i] = { title, description, url };
-
-                    count++;
                 });
                 
                 for(let index in news){
