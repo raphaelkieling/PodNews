@@ -26,20 +26,6 @@ class News{
         }
     }
 
-    async getSearchValue(){
-        this.loader.stop();
-
-        let result = await prompts({
-            type: 'text',
-            name: 'value',
-            message: 'Type a search to news'
-        })
-
-        this.loader.start();
-
-        return result.value;
-    }
-
     async selectNews(news){
         if(!news) throw new Error('Not has news to work');
 
@@ -62,7 +48,7 @@ class News{
         return result.value;
     }
 
-    async getNews(){
+    async getNews({ searchTerm }){
         const newsapi = new NewsAPI(this.key);
 
         let sanitizeNews = (news) => news.map(newObj => ({
@@ -80,13 +66,11 @@ class News{
             return newObj;
         });
 
-        let searchValue = await this.getSearchValue();
-
-        let scope = searchValue ? this.SCOPE.everything : this.SCOPE.topHeadlines;
+        let scope = searchTerm ? this.SCOPE.everything : this.SCOPE.topHeadlines;
 
         let optionsNewsApi = {
             language: this.language,
-            q: searchValue,
+            q: searchTerm,
             pageSize: this.limit,
             sortBy: 'relevancy'
         };

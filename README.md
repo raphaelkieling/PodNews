@@ -20,10 +20,18 @@ Ainda **NÃO** é possível baixar o CLI, pois está em fase de desenvolvimento.
 
     // criando um link simbólico para funcionar de forma global
     npm link
-
-    // executar o CLI
-    podnews
 ```
+
+## Configurando o projeto
+
+O projeto utilizando várias API's que são necessárias, vamos precisar de:
+
+- Copiar o arquivo `.env.example` para `.env` 
+- [Credencial da Google](https://github.com/googleapis/nodejs-speech#using-the-client-library) siga os passos desse repositório, baixe o json e coloque o caminho pra esse arquivo no `.env`
+- [Google NEWS](https://newsapi.org/docs/get-started) apenas crie uma conta e cole sua KEY dentro do `.env`
+- [Google IMAGE](https://github.com/vadimdemedes/google-images#set-up-google-custom-search-engine) siga os passos desse repositório, cole o `CSE ID` em `GOOGLE_IMAGES_CSE_KEY` e o `API KEY` em `GOOGLE_KEY` também no `.env`
+
+**QUALQUER dúvida crie uma issue que irei ajudar.**
 
 # Contribuindo
 - Crie uma branch assim `meu-nome/minha-funcionalidade`

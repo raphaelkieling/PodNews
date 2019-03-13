@@ -5,6 +5,7 @@ const RobotVoice       = require('./robots/voice');
 const RobotFileManager = require('./robots/file-manager');
 const RobotAudio       = require('./robots/audio');
 const RobotNews        = require('./robots/news');
+const RobotImage       = require('./robots/image');
 const Commander        = require('./commander');
 const print            = require('./utils/print');
 const ora              = require('ora');
@@ -45,6 +46,16 @@ async function answerLimitNews(){
 	return response.limit;
 }
 
+async function answerSearchValue(){
+	let result = await prompts({
+		type: 'text',
+		name: 'value',
+		message: 'Type a search to news'
+	})
+
+	return result.value;
+}
+
 async function answerCategory(){
 	let response = await prompts({
 		type: 'text',
@@ -57,7 +68,7 @@ async function answerCategory(){
 }
 
 async function Init(){
-	let { limit, language, category } = Commander.init();
+	let { limit, language, category, searchTerm } = Commander.init();
 	
 	// Init
 	print.banner('INIT', 'Podnews')
@@ -65,6 +76,8 @@ async function Init(){
 	if(!limit) limit = await answerLimitNews();
 	if(!language) language = await answerLanguage();
 	if(!category) category = await answerCategory();
+	if(!searchTerm) searchTerm = await answerSearchValue();
+
 	
 	let data = {};
 
@@ -82,7 +95,8 @@ async function Init(){
 		news: new RobotNews({ limit, language, category }),
 		voice: new RobotVoice({ language }),
 		manager,
-		audio: new RobotAudio({ fileManager: manager })
+		audio: new RobotAudio({ fileManager: manager }),
+		image: new RobotImage({ fileManager: manager })
 	}
 
 	await load('1 - Clean temporary folder',async () => {
@@ -96,7 +110,7 @@ async function Init(){
 
 	await load('2 - Get news from Google News', async (loader)=> {
 		ROBOTS.news.loader = loader;
-		data = await ROBOTS.news.getNews();
+		data = await ROBOTS.news.getNews({ searchTerm });
 	})
 
 	await load('3 - Text to Speech',async (loader) => {
@@ -104,11 +118,16 @@ async function Init(){
 		data = await ROBOTS.voice.getDataWithAudio({ data });
 	});
 
-	await load('4 - Concat audio',async (loader) => {
+	await load('4 - Create thumb image',async (loader) => {
+		ROBOTS.image.loader = loader;
+		await ROBOTS.image.getImage({ searchTerm: searchTerm || data[0].title });
+	});
+
+	await load('5 - Concat audio',async (loader) => {
 		ROBOTS.audio.loader = loader;
 		let audioIntroBinary  = await ROBOTS.voice.getIntro();
 
-		data = await ROBOTS.audio.concatAudio({ data, audioIntroBinary });
+		await ROBOTS.audio.concatAudio({ data, audioIntroBinary });
 	});
 }
 
