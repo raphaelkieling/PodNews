@@ -24,7 +24,7 @@ Ainda **NÃO** é possível baixar o CLI, pois está em fase de desenvolvimento.
     npm start
 ```
 
-## Configurando o projeto
+### Configurando o projeto
 
 O projeto utilizando algumas API's que são necessárias para o projeto funcionar:
 
@@ -32,7 +32,7 @@ O projeto utilizando algumas API's que são necessárias para o projeto funciona
 - [Credencial da Google](https://github.com/googleapis/nodejs-speech#using-the-client-library) siga os passos desse repositório, baixe o json e coloque o caminho pra esse arquivo no `.env`
 - [Google NEWS](https://newsapi.org/docs/get-started) apenas crie uma conta e cole sua KEY dentro do `.env`
 
-## CASO você queira gerar a thumb do podcast
+### CASO você queira gerar a thumb do podcast
 
 Relaxa, se tu não colocar as chaves no `.env` ele vai entender que tu não tá afim hehe
 
