@@ -20,8 +20,8 @@ Ainda **NÃO** é possível baixar o CLI, pois está em fase de desenvolvimento.
     // instalando as dependencias
     npm install
 
-    // criando um link simbólico para funcionar de forma global
-    npm link
+    // executa o podnews
+    npm start
 ```
 
 ## Configurando o projeto

@@ -7,7 +7,7 @@
   "license": "MIT",
   "bin": "./bin/podnews",
   "scripts": {
-    "start": "node src/index"
+    "start": "node bin/podnews"
   },
   "dependencies": {
     "@ffmpeg-installer/ffmpeg": "^1.0.17",
