@@ -38,7 +38,6 @@ Relaxa, se tu não colocar as chaves no `.env` ele vai entender que tu não tá 
 
 - [Google IMAGE](https://github.com/vadimdemedes/google-images#set-up-google-custom-search-engine) siga os passos desse repositório, cole o `CSE ID` em `GOOGLE_IMAGES_CSE_KEY` e o `API KEY` em `GOOGLE_KEY` também no `.env`
 
-**QUALQUER dúvida crie uma issue que irei ajudar.**
 
 # Contribuindo
 - Crie uma branch assim `meu-nome/minha-funcionalidade`
