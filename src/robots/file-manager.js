@@ -10,7 +10,7 @@ class FileManager{
 	}
 
 	getPathTemp(){
-		return path.resolve(process.cwd(), 'temp');
+		return path.resolve(__dirname,'../..', 'temp');
 	}
 
 	async resetTempDirectory(){

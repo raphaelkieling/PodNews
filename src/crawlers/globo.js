@@ -1,7 +1,6 @@
 const rp        = require("request-promise");
 const cheerio   = require('cheerio');
 const Tokenizer = require('sentence-tokenizer');
-const chalk     = require('chalk');
 
 class Globo {
     constructor({ limit }){
@@ -12,7 +11,7 @@ class Globo {
         this.urlNews = 'https://g1.globo.com';
     }
 
-    async _getSentences(url){
+    async getContent(url){
         let options = {
             uri: url,
             transform: function (body) {
@@ -20,8 +19,12 @@ class Globo {
             }
         };
 
+        return await rp(options).then(async ($) => $('.content-text__container ').text());
+    }
+
+    async getSentences(contentString){
         let tokenizer = new Tokenizer(this.name);
-        let contentString = await rp(options).then(async ($) => $('.content-text__container ').text());
+        
         tokenizer.setEntry(contentString);
         let sentences = tokenizer.getSentences();
         return sentences;
@@ -54,7 +57,8 @@ class Globo {
                 });
                 
                 for(let index in news){
-                    news[index].sentences = await this._getSentences(news[index].url);
+                    news[index].content = await this.getContent(news[index].url);
+                    news[index].sentences = await this.getSentences(news[index].content);
                 }
                 
                 return news;

@@ -1,5 +1,3 @@
-require('dotenv').config();
-
 const textToSpeech = require('@google-cloud/text-to-speech');
 const print        = require('../utils/print')
 

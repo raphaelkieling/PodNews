@@ -18,6 +18,15 @@ class Audio{
 		return pathWithName;
 	}
 
+	async saveTranscript(source){
+		this.loader.text = `⚙️	Create a transcription`;
+
+		let data = `Title: ${source.title}\nDate: ${new Date().getDate()}\n----\n${source.content}`;
+		let pathWithName = path.resolve(this.fileManager.getPathTemp(), `transcript.txt`);
+		await fs.writeFileSync(pathWithName, data, 'utf-8');
+		return pathWithName;
+	}
+
 	_concatAudio(songs){
 		return new Promise((resolve ,reject)=>{
 			audioconcat(songs)
@@ -54,6 +63,7 @@ class Audio{
 			}
 			
 			await this._concatAudio(audiosToConcat);
+			await this.saveTranscript(source);
 		}
 	}
 }

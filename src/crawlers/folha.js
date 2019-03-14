@@ -9,7 +9,7 @@ class Folha {
         this.urlNews = "https://www1.folha.uol.com.br/virtual/spiffy/mais-comentadas/home-1.0.0.json";
     }
 
-    async _getSentences(url){
+    async getContent(url){
         let options = {
             uri: url,
             transform: function (body) {
@@ -17,8 +17,12 @@ class Folha {
             }
         };
 
+        return await rp(options).then(async ($) => $('.c-news__body').text());
+    }
+
+    async getSentences(contentString){
         let tokenizer = new Tokenizer(this.name);
-        let contentString = await rp(options).then(async ($) => $('.c-news__body ').text());
+        
         tokenizer.setEntry(contentString);
         let sentences = tokenizer.getSentences();
         return sentences;
@@ -42,7 +46,8 @@ class Folha {
             }
 
             for(let index in news){
-                news[index].sentences = await this._getSentences(news[index].url);
+                news[index].content = await this.getContent(news[index].url);
+                news[index].sentences = await this.getSentences(news[index].content);
             }
 
             return news;

@@ -1,4 +1,6 @@
-require('dotenv').config();
+require('dotenv').config({
+	path: require('path').resolve(__dirname, '../.env')
+});
 
 const RobotCrawler     = require('./robots/crawler');
 const RobotVoice       = require('./robots/voice');
@@ -71,6 +73,24 @@ async function answerCategory(){
 	return response.category;
 }
 
+async function selectNews(news){
+	if(!news) throw new Error('Not has news to work');
+
+	let sanitizedNews = [];
+	for(let newObj of news){
+		sanitizedNews.push({ title: newObj.title, value: newObj });
+	}
+
+	let result = await prompts({
+		type: 'multiselect',
+		name: 'value',
+		message: 'Choice a new',
+		choices: sanitizedNews
+	})
+
+	return result.value;
+}
+
 async function Init(){
 	let { limit, language, category, searchTerm } = Commander.init();
 	
@@ -103,25 +123,32 @@ async function Init(){
 		image: new RobotImage({ fileManager: manager })
 	}
 
-	await load('1 - Clean temporary folder',async (loader, done) => {
+	await load('0 - Clean temporary folder',async (loader, done) => {
 		await ROBOTS.manager.resetTempDirectory();
 		done();
 	});
 
-	// await load('2 - Crawler',async (loader) => {
-	// 	ROBOTS.crawler.loader = loader;
-	// 	data = await ROBOTS.crawler.getAllNews();
-	// });
+	let dataNews = [];
+
+	await load('1 - Crawler',async (loader, done) => {
+		ROBOTS.crawler.loader = loader;
+		dataNews = dataNews.concat(await ROBOTS.crawler.getAllNews())
+		done();
+	});
 
 	await load('2 - Get news from Google News', async (loader, done)=> {
 		ROBOTS.news.loader = loader;
-		data = await ROBOTS.news.getNews({ searchTerm });
+		dataNews = dataNews.concat(await ROBOTS.news.getNews({ searchTerm }));
 		done();
 	})
 
+	dataNews = await selectNews(dataNews);
+
+	let dataTextToSpeech = {};
+
 	await load('3 - Text to Speech',async (loader, done) => {
 		ROBOTS.voice.loader = loader;
-		data = await ROBOTS.voice.getDataWithAudio({ data });
+		dataTextToSpeech = await ROBOTS.voice.getDataWithAudio({ data: dataNews });
 		done();
 	});
 
@@ -129,7 +156,7 @@ async function Init(){
 		ROBOTS.audio.loader = loader;
 		let audioIntroBinary  = await ROBOTS.voice.getIntro();
 
-		await ROBOTS.audio.concatAudio({ data, audioIntroBinary });
+		await ROBOTS.audio.concatAudio({ data: dataTextToSpeech, audioIntroBinary });
 		done();
 	});
 
@@ -141,7 +168,7 @@ async function Init(){
 		
 		ROBOTS.image.init();
 		ROBOTS.image.loader = loader;
-		await ROBOTS.image.getImage({ searchTerm: searchTerm || data[0].title });
+		await ROBOTS.image.getImage({ searchTerm: dataNews[0].title || searchTerm });
 		done();
 	});
 }

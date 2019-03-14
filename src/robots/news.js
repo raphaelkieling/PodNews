@@ -26,28 +26,6 @@ class News{
         }
     }
 
-    async selectNews(news){
-        if(!news) throw new Error('Not has news to work');
-
-        this.loader.stop();
-
-        let sanitizedNews = [];
-        for(let newObj of news){
-            sanitizedNews.push({ title: newObj.title, value: newObj });
-        }
-
-        let result = await prompts({
-            type: 'multiselect',
-            name: 'value',
-            message: 'Choice a new',
-            choices: sanitizedNews
-        })
-
-        this.loader.start();
-
-        return result.value;
-    }
-
     async getNews({ searchTerm }){
         const newsapi = new NewsAPI(this.key);
 
@@ -84,7 +62,6 @@ class News{
             .then(response => response.articles)
             .then(sanitizeNews)
             .then(putSentences)
-            .then(async news => await this.selectNews(news));
     }
 }
 
