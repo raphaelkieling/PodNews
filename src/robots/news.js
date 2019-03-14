@@ -3,8 +3,8 @@ const NewsAPI   = require('newsapi');
 const prompts   = require('prompts');
 
 class News{
-    constructor({ limit = 1 , language = 'pt', category='general'}){
-        this.key      = process.env.GOOGLE_NEWS_CREDENTIAL;
+    constructor({ limit = 1 , language = 'pt', category='general' , credential}){
+        this.key      = credential;
         this.limit    = limit;
         this.loader   = null;
         this.language = this._getLanguage(language);

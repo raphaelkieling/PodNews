@@ -17,8 +17,12 @@ const Folha = require('./crawlers/folha');
 
 async function load(text, fn){
 	let loader = ora(text).start();
-	await fn(loader);
-	loader.succeed();
+	await fn(loader, (done=true,message=text)=>{
+		if(done)
+			loader.succeed();
+		else
+			loader.fail(message);
+	});
 } 
 
 async function answerLanguage(){
@@ -92,15 +96,16 @@ async function Init(){
 
 	const ROBOTS = {
 		crawler: robotCrawler,
-		news: new RobotNews({ limit, language, category }),
+		news: new RobotNews({ limit, language, category , credential: process.env.GOOGLE_NEWS_CREDENTIAL }),
 		voice: new RobotVoice({ language }),
 		manager,
 		audio: new RobotAudio({ fileManager: manager }),
 		image: new RobotImage({ fileManager: manager })
 	}
 
-	await load('1 - Clean temporary folder',async () => {
+	await load('1 - Clean temporary folder',async (loader, done) => {
 		await ROBOTS.manager.resetTempDirectory();
+		done();
 	});
 
 	// await load('2 - Crawler',async (loader) => {
@@ -108,26 +113,36 @@ async function Init(){
 	// 	data = await ROBOTS.crawler.getAllNews();
 	// });
 
-	await load('2 - Get news from Google News', async (loader)=> {
+	await load('2 - Get news from Google News', async (loader, done)=> {
 		ROBOTS.news.loader = loader;
 		data = await ROBOTS.news.getNews({ searchTerm });
+		done();
 	})
 
-	await load('3 - Text to Speech',async (loader) => {
+	await load('3 - Text to Speech',async (loader, done) => {
 		ROBOTS.voice.loader = loader;
 		data = await ROBOTS.voice.getDataWithAudio({ data });
+		done();
 	});
 
-	await load('4 - Create thumb image',async (loader) => {
-		ROBOTS.image.loader = loader;
-		await ROBOTS.image.getImage({ searchTerm: searchTerm || data[0].title });
-	});
-
-	await load('5 - Concat audio',async (loader) => {
+	await load('4 - Concat audio',async (loader, done) => {
 		ROBOTS.audio.loader = loader;
 		let audioIntroBinary  = await ROBOTS.voice.getIntro();
 
 		await ROBOTS.audio.concatAudio({ data, audioIntroBinary });
+		done();
+	});
+
+	await load('5 - Create thumb image',async (loader, done) => {
+		if(!process.env.GOOGLE_IMAGES_CSE_KEY || !process.env.GOOGLE_KEY) {
+			done(false, 'Google KEYS not defineds');
+			return;
+		};
+		
+		ROBOTS.image.init();
+		ROBOTS.image.loader = loader;
+		await ROBOTS.image.getImage({ searchTerm: searchTerm || data[0].title });
+		done();
 	});
 }
 

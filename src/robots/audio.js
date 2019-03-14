@@ -24,7 +24,6 @@ class Audio{
 				.concat(path.resolve(this.fileManager.getPathTemp(), 'all.mp3'))
 				.on('start', (command) => {
 					this.loader.text = `⚙️	Concat start`;
-					resolve();
 				})
 				.on('error', (err, stdout, stderr) => {
 					new Error(err)

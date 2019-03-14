@@ -7,6 +7,10 @@ const Jimp         = require('jimp');
 class Images{
     constructor({ fileManager }){
         this.fileManager = fileManager;
+        this.googleImages = null;
+    }
+
+    init(){
         this.googleImages = new GoogleImages(process.env.GOOGLE_IMAGES_CSE_KEY, process.env.GOOGLE_KEY);
     }
 
@@ -19,9 +23,6 @@ class Images{
             let imagePath = path.resolve(this.fileManager.getPathTemp(), 'thumb.png');
 
             request.head(url, function(err, res, body){
-                console.log('content-type:', res.headers['content-type']);
-                console.log('content-length:', res.headers['content-length']);
-            
                 request(url).pipe(fs.createWriteStream(imagePath)).on('close', ()=> resolve(imagePath));
             });
         })
